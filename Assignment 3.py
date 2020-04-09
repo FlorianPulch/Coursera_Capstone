@@ -39,7 +39,7 @@ df_final = df[df['borough'] != 'Not assigned']
 df_final.shape
 
 geo_location_data = pd.read_csv(
-    r'C:\Users\result\result\Desktop\Geospatial_Coordinates.csv')
+    r'C:\Users\Florian\OneDrive\Capstone_Project\Geospatial_Coordinates.csv')
 
 df_final = df_final.merge(geo_location_data, how='left',
                           left_on='postal_code', right_on='postcode')
@@ -114,16 +114,12 @@ Toronto_grouped = Toronto_encoded.groupby('Neighborhood').mean().reset_index()
 
 Toronto_grouped.head()
 
-kclusters = 5
 
-toronto_grouped_clustering = Toronto_grouped.drop('Neighborhood', 1)
+def return_most_common_venues(row, num_top_venues):
+    row_categories = row.iloc[1:]
+    row_categories_sorted = row_categories.sort_values(ascending=False)
 
-# run k-means clustering
-kmeans = KMeans(n_clusters=kclusters, random_state=0).fit(
-    toronto_grouped_clustering)
-
-# check cluster labels generated for each row in the dataframe
-kmeans.labels_[0:10]
+    return row_categories_sorted.index.values[0:num_top_venues]
 
 
 num_top_venues = 10
@@ -140,7 +136,6 @@ for ind in np.arange(num_top_venues):
 
 Toronto_grouped.head()
 
-# create a new dataframe
 neighborhoods_venues_sorted = pd.DataFrame(columns=columns)
 neighborhoods_venues_sorted['Neighborhood'] = Toronto_grouped['Neighborhood']
 
@@ -148,23 +143,31 @@ for ind in np.arange(Toronto_grouped.shape[0]):
     neighborhoods_venues_sorted.iloc[ind, 1:] = return_most_common_venues(
         Toronto_grouped.iloc[ind, :], num_top_venues)
 
-neighborhoods_venues_sorted.head()
+kclusters = 5
+
+toronto_grouped_clustering = Toronto_grouped.drop('Neighborhood', 1)
+
+# run k-means clustering
+kmeans = KMeans(n_clusters=kclusters, random_state=0).fit(
+    toronto_grouped_clustering)
+
+# check cluster labels generated for each row in the dataframe
+kmeans.labels_[0:10]
 
 
-def return_most_common_venues(row, num_top_venues):
-    row_categories = row.iloc[1:]
-    row_categories_sorted = row_categories.sort_values(ascending=False)
-
-    return row_categories_sorted.index.values[0:num_top_venues]
+# create a new dataframe
 
 
 neighborhoods_venues_sorted.insert(0, 'Cluster Labels', kmeans.labels_)
+
+
+neighborhoods_venues_sorted.head()
+
 
 toronto_merged = toronto_only
 
 neighborhoods_venues_sorted.head()
 toronto_merged.head()
-toronto_merged['Cluster Labels']
 
 
 # merge toronto_grouped with toronto_data to add latitude/longitude for each neighborhood
