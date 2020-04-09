@@ -39,7 +39,7 @@ df_final = df[df['borough'] != 'Not assigned']
 df_final.shape
 
 geo_location_data = pd.read_csv(
-    r'C:\Users\flpulch\OneDrive - Deloitte (O365D)\Desktop\Geospatial_Coordinates.csv')
+    r'C:\Users\result\result\Desktop\Geospatial_Coordinates.csv')
 
 df_final = df_final.merge(geo_location_data, how='left',
                           left_on='postal_code', right_on='postcode')
